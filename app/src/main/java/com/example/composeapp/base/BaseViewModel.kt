@@ -1,7 +1,7 @@
 package com.example.composeapp.base
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composeapp.utils.DataState
@@ -13,8 +13,8 @@ import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 open class BaseViewModel : ViewModel() {
-    protected val mutableUiState = MutableLiveData<UiState>(UiState.Empty)
-    val uiState: LiveData<UiState> = mutableUiState
+    protected val mutableUiState = mutableStateOf<UiState>(UiState.Empty)
+    val uiState: State<UiState> = mutableUiState
 
     private val exceptionHandler = CoroutineExceptionHandler { _: CoroutineContext, throwable: Throwable ->
         mutableUiState.value = UiState.Loading(false)

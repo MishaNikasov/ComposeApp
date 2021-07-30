@@ -8,6 +8,7 @@ import retrofit2.http.Query
 interface NetworkApi  {
     @GET("photos")
     suspend fun getPhotos(
+        @Query("page") page: Int,
         @Query("client_id") clientId: String = "4nurrx0z6LjIjgaD3PFZsNhPyrzgOXGfV8L6BDJjzHY"
-    ): Response<ArrayList<PhotosResponseModel>?>
+    ): Response<List<PhotosResponseModel>?>
 }
