@@ -7,8 +7,28 @@ import retrofit2.Response
 
 open class BaseRepository {
 
-    fun <Model, Entity> startRequest(
+    @Deprecated("Use mapper")
+    fun <Model> startRequest(
         response: Response<Model>,
+        responseAction: ((Model) -> (Unit))? = null
+    ): DataState<Model> {
+        try {
+            if (response.isSuccessful) {
+                response.body()?.let { model ->
+                    responseAction?.invoke(model)
+                    return DataState.Success(model)
+                }
+                return DataState.Error(ErrorModel(response))
+            } else {
+                return DataState.Error(ErrorModel(response))
+            }
+        } catch (e: Exception) {
+            return DataState.Error(ErrorModel(response))
+        }
+    }
+
+    fun <Model, Entity> startRequest(
+        response: Response<Model?>,
         mapper: EntityMapper<Model, Entity>,
         rawResponseAction: ((Model?) -> (Unit))? = null
     ): DataState<Entity> {
