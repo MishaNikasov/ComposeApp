@@ -1,10 +1,10 @@
 package com.example.composeapp.ui.screen.main
 
-import androidx.compose.runtime.mutableStateOf
 import com.example.composeapp.base.BaseViewModel
 import com.example.composeapp.repository.PhotoRepository
 import com.example.composeapp.ui.entity.PhotoEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -12,16 +12,18 @@ class MainViewModel @Inject constructor(
     private val photoRepository: PhotoRepository
 ): BaseViewModel() {
 
-    private val _photos = mutableStateOf<List<PhotoEntity>>(listOf())
+    private val _photos = MutableStateFlow<List<PhotoEntity>>(listOf())
     val photos = _photos
 
-    val searchQuery = mutableStateOf("")
+    val isPaginating = MutableStateFlow(false)
+    val isSearching = MutableStateFlow(false)
 
-    val isPaginating = mutableStateOf(false)
-    val isSearching = mutableStateOf(false)
+    private val startingPageForPagination = 1
 
-    private var currentPage = 0
-    private var isEndReached = mutableStateOf(false)
+    private val searchQuery = MutableStateFlow("")
+
+    private val currentPage = MutableStateFlow(startingPageForPagination)
+    private val isEndReached = MutableStateFlow(false)
 
     init {
         getPhotos()
@@ -30,32 +32,31 @@ class MainViewModel @Inject constructor(
     fun getPhotos() {
         isPaginating.value = true
         handleRequest(
-            suspend { photoRepository.getPhotos(currentPage) },
+            suspend { photoRepository.getPhotos(currentPage.value) },
             successAction = {
-                currentPage++
-                isPaginating.value = false
-
                 _photos.value += it ?: listOf()
+
+                currentPage.value++
+                isPaginating.value = false
             }
         )
     }
 
     fun searchPhotos() {
         isPaginating.value = true
-        isSearching.value = true
         handleRequest(
-            suspend { photoRepository.searchPhotos(currentPage, searchQuery.value) },
+            suspend { photoRepository.searchPhotos(currentPage.value, searchQuery.value) },
             successAction = {
                 _photos.value += it?.results ?: listOf()
 
-                currentPage++
+                currentPage.value++
                 isPaginating.value = false
             }
         )
     }
 
     fun activateSearching(query: String) {
-        currentPage = 0
+        currentPage.value = startingPageForPagination
         _photos.value = mutableListOf()
         isSearching.value = true
         searchQuery.value = query
@@ -63,7 +64,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun deactivateSearching() {
-        currentPage = 0
+        currentPage.value = startingPageForPagination
         _photos.value = mutableListOf()
         isSearching.value = false
         searchQuery.value = ""
