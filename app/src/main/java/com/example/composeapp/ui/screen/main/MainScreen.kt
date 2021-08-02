@@ -9,19 +9,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
 import com.example.composeapp.ui.entity.PhotoEntity
 import com.example.composeapp.ui.screen.Screen
+import com.example.composeapp.ui.view.CoilImage
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
@@ -136,9 +132,11 @@ fun PhotoList(
             }
             PhotoItem(
                 entity = entries[it],
-                modifier = Modifier.clickable {
-                    onPhotoClick(entries[it])
-                }
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .clickable {
+                        onPhotoClick(entries[it])
+                    }
             )
         }
     }
@@ -149,31 +147,9 @@ fun PhotoItem(
     entity: PhotoEntity,
     modifier: Modifier
 ) {
-    Box(modifier = modifier.aspectRatio(1f)) {
-        val painter = rememberImagePainter(
-            data = entity.image.small,
-            builder = {
-                crossfade(true)
-            }
-        )
-
-        Image(
-            painter = painter,
-            modifier = Modifier.fillMaxSize(),
-            contentDescription = entity.description,
-            contentScale = ContentScale.Crop
-        )
-
-        when (painter.state) {
-            is ImagePainter.State.Loading -> {
-                CircularProgressIndicator(
-                    color = Color.Black,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .height(40.dp)
-                        .width(40.dp)
-                )
-            }
-        }
-    }
+    CoilImage(
+        image = entity.image.small,
+        contentDescription = entity.description,
+        modifier = modifier
+    )
 }
