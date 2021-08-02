@@ -24,8 +24,8 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun MainScreen(
-    navController: NavController,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    moveToDetail: () -> Unit
 ) {
     Surface(
         color = MaterialTheme.colors.background,
@@ -48,7 +48,7 @@ fun MainScreen(
             PhotoList(
                 mainViewModel = mainViewModel,
                 onPhotoClick = {
-                    navController.navigate(Screen.Detail.putArgs(it.id))
+                    moveToDetail()
                 }
             )
         }

@@ -24,7 +24,8 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun MainNavigation(
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    moveToDetail: () -> Unit
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -64,12 +65,10 @@ fun MainNavigation(
                 navController = navController,
                 startDestination = Screen.Main.route
             ) {
-                composable(
-                    route = Screen.Main.route
-                ) {
+                composable(route = Screen.Main.route) {
                     MainScreen(
-                        navController = navController,
-                        mainViewModel
+                        mainViewModel = mainViewModel,
+                        moveToDetail = moveToDetail
                     )
                 }
                 composable(route = Screen.Topic.route) {
@@ -78,41 +77,3 @@ fun MainNavigation(
             }
     }
 }
-
-//NavHost(
-//navController = navController,
-//startDestination = Screen.Topic.route
-//) {
-//    navigation(
-//        startDestination = Screen.Main.route,
-//        route = Screen.Main.route,
-//    ) {
-//
-//        composable(
-//            route = Screen.Main.route
-//        ) {
-//            MainScreen(
-//                navController = navController,
-//                mainViewModel
-//            )
-//        }
-//        composable(
-//            route = Screen.Detail.routeWithArgs,
-//            arguments = listOf(
-//                navArgument(PHOTO_ID) {
-//                    type = NavType.StringType
-//                }
-//            )
-//        ) { entry ->
-//            DetailScreen(
-//                navController = navController,
-//                photoId = entry.arguments?.getString(PHOTO_ID),
-//                mainViewModel
-//            )
-//        }
-//    }
-//
-//    composable(route = Screen.Topic.route) {
-//        TopicScreen()
-//    }
-//}
