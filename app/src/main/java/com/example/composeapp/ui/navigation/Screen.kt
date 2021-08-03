@@ -14,7 +14,10 @@ sealed class Screen(val route: String, val routeWithArgs: String = route) {
     object Home: Screen(ScreenId.HomeId.id)
     object Main: Screen(ScreenId.MainId.id)
     object Topic: Screen(ScreenId.TopicId.id)
-    object Detail: Screen(ScreenId.DetailId.id, "${ScreenId.DetailId.id}/{$PHOTO_ID}") {
+    object Detail:
+        Screen(ScreenId.DetailId.id,
+        "${ScreenId.DetailId.id}/{$PHOTO_ID}"
+    ) {
         fun putArgs(photoId: String): String {
             return withArgs(photoId)
         }

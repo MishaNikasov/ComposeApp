@@ -20,7 +20,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun MainScreen(
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
     moveToDetail: (String) -> Unit
 ) {
     val navController = rememberNavController()

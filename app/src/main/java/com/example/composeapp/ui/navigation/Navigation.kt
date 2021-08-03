@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.composeapp.ui.screen.main.MainScreen
-import com.example.composeapp.ui.navigation.Screen
 import com.example.composeapp.ui.screen.detail.DetailScreen
 import com.example.composeapp.ui.screen.detail.PHOTO_ID
 import com.example.composeapp.ui.screen.home.HomeViewModel
@@ -29,6 +28,7 @@ fun Navigation(
     ) {
         composable(route = Screen.Main.route) {
             MainScreen(
+                homeViewModel = homeViewModel,
                 moveToDetail = {
                     navController.navigate(Screen.Detail.putArgs(photoId = it))
                 }
@@ -44,9 +44,8 @@ fun Navigation(
             )
         ) { entry ->
             DetailScreen(
-                navController = navController,
                 photoId = entry.arguments?.getString(PHOTO_ID),
-                homeViewModel
+                homeViewModel = homeViewModel
             )
         }
     }

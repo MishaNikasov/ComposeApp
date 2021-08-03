@@ -21,7 +21,6 @@ fun CoilImage(
     image: String,
     contentDescription: String,
     modifier: Modifier = Modifier,
-    imageModifier: Modifier = Modifier.fillMaxSize(),
     builder: ImageRequest.Builder.() -> Unit = {
         crossfade(true)
     },
@@ -36,10 +35,7 @@ fun CoilImage(
         )
     }
 ) {
-    Box(
-        modifier = modifier
-    ) {
-
+    Box {
         val painter = rememberImagePainter(
             data = image,
             builder = builder
@@ -47,7 +43,7 @@ fun CoilImage(
 
         Image(
             painter = painter,
-            modifier = imageModifier,
+            modifier = modifier,
             contentDescription = contentDescription,
             contentScale = contentScale
         )

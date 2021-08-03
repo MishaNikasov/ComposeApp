@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.composeapp.ui.entity.PhotoEntity
+import com.example.composeapp.ui.theme.AppColor
 import com.example.composeapp.ui.view.CoilImage
 import kotlinx.coroutines.InternalCoroutinesApi
 
@@ -70,8 +71,8 @@ fun SearchBar(
         mutableStateOf(false)
     }
 
-    val backgroundColor by animateColorAsState(if (isSelected) Color.White else Color(0xFFeeeeee))
-    val borderColor by animateColorAsState(if (isSelected) Color(0xFFd1d1d1) else Color.Transparent)
+    val backgroundColor by animateColorAsState(if (isSelected) MaterialTheme.colors.background else MaterialTheme.colors.secondary)
+    val borderColor by animateColorAsState(if (isSelected) MaterialTheme.colors.onSecondary else Color.Transparent)
 
     Card(
         shape = CircleShape,
@@ -89,9 +90,7 @@ fun SearchBar(
             },
             maxLines = 1,
             singleLine = true,
-            textStyle = TextStyle(
-                color = Color(0xFF3D3D3D)
-            ),
+            textStyle = MaterialTheme.typography.h1,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
@@ -102,7 +101,7 @@ fun SearchBar(
         if (isHintDisplayed) {
             Text(
                 text = hint,
-                color = Color(0xFF767676),
+                style = MaterialTheme.typography.h2,
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 12.dp)
             )
