@@ -1,4 +1,4 @@
-package com.example.composeapp.ui.controller
+package com.example.composeapp.ui.navigation
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
@@ -8,18 +8,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import com.example.composeapp.ui.navigation.MainNavigation
-import com.example.composeapp.ui.screen.Screen
+import com.example.composeapp.ui.screen.main.MainScreen
+import com.example.composeapp.ui.navigation.Screen
 import com.example.composeapp.ui.screen.detail.DetailScreen
 import com.example.composeapp.ui.screen.detail.PHOTO_ID
-import com.example.composeapp.ui.screen.main.MainViewModel
+import com.example.composeapp.ui.screen.home.HomeViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @ExperimentalFoundationApi
 @InternalCoroutinesApi
 @Composable
-fun MainController(
-    mainViewModel: MainViewModel = hiltViewModel()
+fun Navigation(
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
 
@@ -28,9 +28,9 @@ fun MainController(
         startDestination = Screen.Main.route
     ) {
         composable(route = Screen.Main.route) {
-            MainNavigation(
+            MainScreen(
                 moveToDetail = {
-                    navController.navigate(Screen.Detail.routeWithArgs)
+                    navController.navigate(Screen.Detail.putArgs(photoId = it))
                 }
             )
         }
@@ -46,7 +46,7 @@ fun MainController(
             DetailScreen(
                 navController = navController,
                 photoId = entry.arguments?.getString(PHOTO_ID),
-                mainViewModel
+                homeViewModel
             )
         }
     }

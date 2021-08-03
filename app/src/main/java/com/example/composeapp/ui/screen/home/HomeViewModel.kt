@@ -1,4 +1,4 @@
-package com.example.composeapp.ui.screen.main
+package com.example.composeapp.ui.screen.home
 
 import com.example.composeapp.base.BaseViewModel
 import com.example.composeapp.repository.PhotoRepository
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val photoRepository: PhotoRepository
 ): BaseViewModel() {
 

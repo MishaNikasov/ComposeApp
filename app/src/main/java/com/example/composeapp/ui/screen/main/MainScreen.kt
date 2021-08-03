@@ -1,155 +1,75 @@
 package com.example.composeapp.ui.screen.main
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.composeapp.ui.entity.PhotoEntity
-import com.example.composeapp.ui.screen.Screen
-import com.example.composeapp.ui.view.CoilImage
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.*
+import com.example.composeapp.ui.navigation.Screen
+import com.example.composeapp.ui.screen.home.HomeScreen
+import com.example.composeapp.ui.screen.home.HomeViewModel
+import com.example.composeapp.ui.screen.topics.TopicScreen
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun MainScreen(
-    mainViewModel: MainViewModel,
-    moveToDetail: () -> Unit
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    moveToDetail: (String) -> Unit
 ) {
-    Surface(
-        color = MaterialTheme.colors.background,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Column {
-            SearchBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                hint = "Search",
-                onSearch = {
-                    if (it.isEmpty())
-                        mainViewModel.deactivateSearching()
-                    else
-                        mainViewModel.activateSearching(it)
-                }
-            )
-            PhotoList(
-                mainViewModel = mainViewModel,
-                onPhotoClick = {
-                    moveToDetail()
-                }
-            )
-        }
-    }
-}
-
-@InternalCoroutinesApi
-@Composable
-fun SearchBar(
-    modifier: Modifier = Modifier,
-    hint: String = "",
-    onSearch: (String) -> Unit = {}
-) {
-    var text by remember {
-        mutableStateOf("")
-    }
-    var isHintDisplayed by remember {
-        mutableStateOf(hint != "")
-    }
-    var isSelected by remember {
-        mutableStateOf(false)
-    }
-
-    val backgroundColor by animateColorAsState(if (isSelected) Color.White else Color(0xFFeeeeee))
-    val borderColor by animateColorAsState(if (isSelected) Color(0xFFd1d1d1) else Color.Transparent)
-
-    Card(
-        shape = CircleShape,
-        elevation = 0.dp,
-        border = BorderStroke(1.dp, borderColor),
-        backgroundColor = backgroundColor,
-        modifier = modifier
-    ) {
-        BasicTextField(
-            value = text,
-            onValueChange = {
-                text = it
-                isHintDisplayed = it.isEmpty()
-                onSearch(it)
-            },
-            maxLines = 1,
-            singleLine = true,
-            textStyle = TextStyle(
-                color = Color(0xFF3D3D3D)
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .onFocusChanged {
-                    isSelected = it.isFocused
-                }
-        )
-        if (isHintDisplayed) {
-            Text(
-                text = hint,
-                color = Color(0xFF767676),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
-            )
-        }
-    }
-}
-
-@ExperimentalFoundationApi
-@Composable
-fun PhotoList(
-    mainViewModel: MainViewModel,
-    onPhotoClick: (PhotoEntity) -> Unit
-) {
-    val entries by mainViewModel.photos.collectAsState()
-    val isPaginating by mainViewModel.isPaginating.collectAsState()
-    val isSearching by mainViewModel.isSearching.collectAsState()
-
-    LazyVerticalGrid(cells = GridCells.Fixed(2)) {
-        items(entries.size) {
-            if (it >= entries.size - 1 && !isPaginating) {
-                if (isSearching)
-                    mainViewModel.searchPhotos()
-                else
-                    mainViewModel.getPhotos()
-            }
-            PhotoItem(
-                entity = entries[it],
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clickable {
-                        onPhotoClick(entries[it])
-                    }
-            )
-        }
-    }
-}
-
-@Composable
-fun PhotoItem(
-    entity: PhotoEntity,
-    modifier: Modifier
-) {
-    CoilImage(
-        image = entity.image.small,
-        contentDescription = entity.description,
-        modifier = modifier
+    val navController = rememberNavController()
+    val items = listOf(
+        Screen.Home,
+        Screen.Topic
     )
+    Scaffold(
+        bottomBar = {
+            BottomNavigation {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                items.forEach { screen ->
+                    BottomNavigationItem(
+                        icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+                        label = { Text(text = "ad") },
+                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+            }
+        }) {
+            NavHost(
+                navController = navController,
+                startDestination = Screen.Home.route
+            ) {
+                composable(route = Screen.Home.route) {
+                    HomeScreen(
+                        homeViewModel = homeViewModel,
+                        moveToDetail = moveToDetail
+                    )
+                }
+                composable(route = Screen.Topic.route) {
+                    TopicScreen()
+                }
+            }
+    }
 }
