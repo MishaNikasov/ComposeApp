@@ -14,11 +14,27 @@ class TestViewModel @Inject constructor(
 
 ): ViewModel() {
 
+    private val _list = MutableStateFlow<List<String>>(arrayListOf())
+    val list = _list
+
     private val _uiState = MutableStateFlow<UiState>(UiState.Empty)
     val uiState = _uiState
 
     private val _text = MutableStateFlow("")
     val text = _text
+
+    fun loadItems() {
+        viewModelScope.launch {
+            _uiState.value = UiState.Loading(true)
+            delay(1000)
+            val array = arrayListOf<String>()
+            for (i in 1..10000) {
+                array.add("Item $i")
+            }
+            _list.value = array
+            _uiState.value = UiState.Loading(false)
+        }
+    }
 
     fun startRequest(requestText: String) {
         viewModelScope.launch {
